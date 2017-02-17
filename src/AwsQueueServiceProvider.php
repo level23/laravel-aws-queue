@@ -23,7 +23,7 @@ class AwsQueueServiceProvider extends ServiceProvider
      */
     protected function registerAwsConnector(QueueManager $manager)
     {
-        $manager->addConnector('aws',function() {
+        $manager->addConnector('aws', function() {
             return new AwsConnector;
         });
     }

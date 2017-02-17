@@ -36,7 +36,7 @@ class AwsQueue extends SqsQueue
         $body = json_decode($message['Body'], true);
 
         // If there is no subject available its an sqs
-        if(isset($body['Subject'])) {
+        if (isset($body['Subject'])) {
             $message['Body'] = json_encode(
                 $this->createStringPayload(
                     $body['Subject'],
