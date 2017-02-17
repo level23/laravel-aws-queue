@@ -1,0 +1,44 @@
+{
+  "name": "level23/laravel-aws-queue",
+  "description": "Wrapper for the laravel sqs queue to accept sns topic messages.",
+  "license": "MIT",
+  "keywords": ["laravel", "queue", "aws", "sqs", "sns", "lumen"],
+  "authors": [
+    {
+      "name": "Marc van der Meulen",
+      "email": "marc@level23.nl",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.0",
+    "illuminate/queue": "^5.4",
+    "illuminate/support": "^5.4",
+    "aws/aws-sdk-php": "^3.22"
+  },
+  "require-dev": {
+    "fzaninotto/faker": "~1.4",
+    "mockery/mockery": "0.9.*",
+    "orchestra/testbench": "^3.4",
+    "pdepend/pdepend": "^2.5",
+    "phploc/phploc": "^3.0",
+    "phpmd/phpmd": "^2.6",
+    "phpunit/phpunit": "~5.7",
+    "sebastian/phpcpd": "^3.0",
+    "squizlabs/php_codesniffer": "^2.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "Level23\\AwsQueue\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Level23\\AwsQueue\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true
+  }
+}
