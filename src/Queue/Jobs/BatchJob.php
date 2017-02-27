@@ -54,7 +54,7 @@ class BatchJob extends SqsJob
 
         echo 'Deleting '.count($entries) . ' messages'.PHP_EOL;
 
-        $response = $this->sqs->deleteMessage([
+        $response = $this->sqs->deleteMessageBatch([
             'QueueUrl' => $this->queue,
             'Entries' => $entries,
         ]);
