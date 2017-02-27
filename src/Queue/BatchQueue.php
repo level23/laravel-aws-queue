@@ -48,8 +48,10 @@ class BatchQueue extends SqsQueue
      */
     public function pop($queue = null)
     {
+        $queueUrl = $this->getQueue($queue);
+
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $this->getQueue($queue),
+            'QueueUrl' => $queueUrl,
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
@@ -62,7 +64,7 @@ class BatchQueue extends SqsQueue
                 'Body' => $this->createStringPayload($this->getHandler($queue),[])
             ];
 
-            $batchJob = new BatchJob($this->container, $this->sqs, $batchMessage, $this->connectionName, $queue);
+            $batchJob = new BatchJob($this->container, $this->sqs, $batchMessage, $this->connectionName, $queueUrl);
 
             foreach ($response['Messages'] as $message) {
 
@@ -70,7 +72,7 @@ class BatchQueue extends SqsQueue
 
                 $batchJob->pushJob(new SqsJob(
                     $this->container, $this->sqs, $message,
-                    $this->connectionName, $queue
+                    $this->connectionName, $queueUrl
                 ));
             }
 
