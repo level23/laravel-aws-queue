@@ -51,7 +51,7 @@ class BatchJob extends SqsJob
 
         $response = $this->sqs->deleteMessageBatch([
             'QueueUrl' => $this->queue,
-            'Entries' => $entries,
+            'Entries' => $entries->toArray(),
         ]);
 
         foreach ($response['Successful'] as $message) {
@@ -79,7 +79,7 @@ class BatchJob extends SqsJob
 
         $response = $this->sqs->changeMessageVisibilityBatch([
             'QueueUrl' => $this->queue,
-            'Entries' => $entries,
+            'Entries' => $entries->toArray(),
         ]);
 
         foreach ($response['Successful'] as $message) {
