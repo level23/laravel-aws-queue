@@ -10,9 +10,20 @@ class BatchJob extends SqsJob
      */
     protected $jobs = [];
 
+    /**
+     * @param SqsJob $job
+     */
     public function pushJob(SqsJob $job)
     {
         $this->jobs[$job->getJobId()] = $job;
+    }
+
+    /**
+     * @return SqsJob[]
+     */
+    public function getJobs()
+    {
+        return $this->jobs;
     }
 
     /**
