@@ -34,5 +34,4 @@ trait JobParser
             'timeout' => null, 'data' => $data,
         ];
     }
-
 }

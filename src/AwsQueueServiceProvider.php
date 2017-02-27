@@ -25,7 +25,7 @@ class AwsQueueServiceProvider extends ServiceProvider
      */
     protected function registerAwsConnector(QueueManager $manager)
     {
-        $manager->addConnector('aws', function() {
+        $manager->addConnector('aws', function () {
             return new AwsConnector;
         });
     }
@@ -37,7 +37,7 @@ class AwsQueueServiceProvider extends ServiceProvider
      */
     protected function registerBatchConnector(QueueManager $manager)
     {
-        $manager->addConnector('aws-batch', function() {
+        $manager->addConnector('aws-batch', function () {
             return new BatchConnector;
         });
     }

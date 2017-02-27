@@ -24,7 +24,9 @@ class SqsConnector extends LaravelSqsConnector
         }
 
         return new SqsQueue(
-            new SqsClient($config), $config['queue'], Arr::get($config, 'prefix', '')
+            new SqsClient($config),
+            $config['queue'],
+            Arr::get($config, 'prefix', '')
         );
     }
 }

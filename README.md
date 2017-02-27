@@ -46,6 +46,21 @@ Then in your config/queue.php set the driver for sqs to use our new driver named
 ]
 ```
 
+## Batch jobs
+
+To receive batch jobs change the driver to `aws-batch` and add the following to the config
+```php
+'sqs' => [
+    'driver' => 'aws-batch', //default is sqs
+    'max' => 10,
+    'handler' => 'Classname or binding name in ioc'
+    ...
+]
+```
+
+This method gives you the ability to receive messages in batch and handle them at once!
+The maximum AWS allows us is 10 messages per request
+
 ## Requirements
 
 To make use if this package you have to run PHP 7.0 or higher.

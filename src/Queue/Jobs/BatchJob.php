@@ -2,7 +2,6 @@
 
 namespace Level23\AwsQueue\Queue\Jobs;
 
-
 class BatchJob extends SqsJob
 {
     /**
@@ -43,23 +42,17 @@ class BatchJob extends SqsJob
      */
     public function delete()
     {
-        $entries = [];
-
-        foreach ($this->jobs as $job) {
-            $entries[] = [
+        $entries = collect($this->jobs)->transform(function (SqsJob $job) {
+            return [
                 'Id' => $job->getJobId(),
                 'ReceiptHandle' => $job->getReceiptHandle()
             ];
-        }
-
-        echo 'Deleting '.count($entries) . ' messages'.PHP_EOL;
+        });
 
         $response = $this->sqs->deleteMessageBatch([
             'QueueUrl' => $this->queue,
             'Entries' => $entries,
         ]);
-
-        echo 'Deleted '.count($response['Successful']) . ' messages'.PHP_EOL;
 
         foreach ($response['Successful'] as $message) {
             $this->jobs[$message['Id']]->setDeleted();
@@ -76,24 +69,18 @@ class BatchJob extends SqsJob
      */
     public function release($delay = 0)
     {
-        $entries = [];
-
-        foreach ($this->jobs as $job) {
-            $entries[] = [
+        $entries = collect($this->jobs)->transform(function (SqsJob $job) use ($delay) {
+            return [
                 'Id' => $job->getJobId(),
                 'ReceiptHandle' => $job->getReceiptHandle(),
                 'VisibilityTimeout' => $delay,
             ];
-        }
-
-        echo 'Releasing '.count($entries) . ' messages'.PHP_EOL;
+        });
 
         $response = $this->sqs->changeMessageVisibilityBatch([
             'QueueUrl' => $this->queue,
             'Entries' => $entries,
         ]);
-
-        echo 'Released '.count($response['Successful']) . ' messages'.PHP_EOL;
 
         foreach ($response['Successful'] as $message) {
             $this->jobs[$message['Id']]->setDeleted();

@@ -23,7 +23,9 @@ class AwsConnector extends SqsConnector
         }
 
         return new AwsQueue(
-            new SqsClient($config), $config['queue'], Arr::get($config, 'prefix', '')
+            new SqsClient($config),
+            $config['queue'],
+            Arr::get($config, 'prefix', '')
         );
     }
 }

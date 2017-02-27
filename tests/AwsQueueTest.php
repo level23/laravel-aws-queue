@@ -39,7 +39,6 @@ class AwsQueueTest extends TestCase
             'job' => 'test',
             'data' => ['key' => 'value']
         ];
-
     }
 
     public function testWillCallReceiveMessage()
@@ -65,7 +64,7 @@ class AwsQueueTest extends TestCase
         $job = $queue->pop();
 
         $this->assertInstanceOf(SqsJob::class, $job);
-        $this->assertEquals(json_decode($job->getRawBody(),true), $this->expectedMessage);
+        $this->assertEquals(json_decode($job->getRawBody(), true), $this->expectedMessage);
     }
 
     public function testCanReceiveSNSMessage()
@@ -85,6 +84,6 @@ class AwsQueueTest extends TestCase
         $job = $queue->pop();
 
         $this->assertInstanceOf(SqsJob::class, $job);
-        $this->assertEquals(json_decode($job->getRawBody(),true),$this->expectedMessage);
+        $this->assertEquals(array_only(json_decode($job->getRawBody(), true), ['job','data']), $this->expectedMessage);
     }
 }

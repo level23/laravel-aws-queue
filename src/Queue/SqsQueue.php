@@ -21,12 +21,14 @@ class SqsQueue extends LaravelSqsQueue
         ]);
 
         if (count($response['Messages']) > 0) {
-
             $message = $this->parseJobMessage($response['Messages'][0]);
 
             return new SqsJob(
-                $this->container, $this->sqs, $message,
-                $this->connectionName, $queue
+                $this->container,
+                $this->sqs,
+                $message,
+                $this->connectionName,
+                $queue
             );
         }
     }
