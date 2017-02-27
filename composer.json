@@ -10,12 +10,6 @@
       "role": "Developer"
     }
   ],
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/level23/laravel-aws-queue.git"
-    }
-  ],
   "require": {
     "php": "^7.0",
     "illuminate/queue": "^5.4",
