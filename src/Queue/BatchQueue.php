@@ -11,9 +11,25 @@ class BatchQueue extends SqsQueue
     use JobParser;
 
     /**
-     * @var
+     * @var string|null
      */
     protected $handlerClass;
+
+    /**
+     * @var int
+     */
+    protected $maxMessages = 1;
+
+    /**
+     * @param int $max
+     * @return $this
+     */
+    public function setMaxMessages(int $max = 1)
+    {
+        $this->maxMessages = $max;
+
+        return $this;
+    }
 
     /**
      * @param $handler
@@ -53,6 +69,7 @@ class BatchQueue extends SqsQueue
         $response = $this->sqs->receiveMessage([
             'QueueUrl' => $queueUrl,
             'AttributeNames' => ['ApproximateReceiveCount'],
+            'MaxNumberOfMessages' => $this->maxMessages
         ]);
 
         echo 'Popping '.count($response['Messages']) . ' messages'.PHP_EOL;
