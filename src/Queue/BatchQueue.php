@@ -11,6 +11,36 @@ class BatchQueue extends SqsQueue
     use JobParser;
 
     /**
+     * @var
+     */
+    protected $handlerClass;
+
+    /**
+     * @param $handler
+     * @return $this
+     */
+    public function setHandlerClass($handler = null)
+    {
+        $this->handlerClass = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param $queue
+     * @return string
+     */
+    public function getHandler($queue)
+    {
+        if($this->handlerClass)
+        {
+            return $this->handlerClass;
+        }
+
+        return 'batch-'.$queue;
+    }
+
+    /**
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
@@ -19,7 +49,7 @@ class BatchQueue extends SqsQueue
     public function pop($queue = null)
     {
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $queue = $this->getQueue($queue),
+            'QueueUrl' => $this->getQueue($queue),
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
@@ -29,7 +59,7 @@ class BatchQueue extends SqsQueue
 
             $batchMessage = [
                 'MessageId' => null,
-                'Body' => $this->createStringPayload('batch-'.$queue,[])
+                'Body' => $this->createStringPayload($this->getHandler($queue),[])
             ];
 
             $batchJob = new BatchJob($this->container, $this->sqs, $batchMessage, $this->connectionName, $queue);

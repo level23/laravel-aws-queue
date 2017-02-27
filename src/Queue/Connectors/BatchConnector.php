@@ -23,8 +23,26 @@ class BatchConnector extends SqsConnector
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
         }
 
-        return new BatchQueue(
+        return (new BatchQueue(
             new SqsClient($config), $config['queue'], Arr::get($config, 'prefix', '')
-        );
+        ))->setHandlerClass($config['handler']);
+    }
+
+    /**
+     * Get the default configuration for SQS.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function getDefaultConfiguration(array $config)
+    {
+        return array_merge([
+            'version' => 'latest',
+            'handler' => null,
+            'http' => [
+                'timeout' => 60,
+                'connect_timeout' => 60,
+            ],
+        ], $config);
     }
 }
