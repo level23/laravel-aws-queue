@@ -88,5 +88,4 @@ class BatchJob extends SqsJob
             $this->jobs[$message['Id']]->setDeleted();
         }
     }
-
 }

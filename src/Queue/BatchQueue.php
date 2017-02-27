@@ -27,7 +27,10 @@ class BatchQueue extends SqsQueue
 
         if (count($response['Messages']) > 0) {
 
-            $batchMessage = $this->createStringPayload('batch-'.$queue,[]);
+            $batchMessage = [
+                'MessageId' => null,
+                'Body' => $this->createStringPayload('batch-'.$queue,[])
+            ];
 
             $batchJob = new BatchJob($this->container, $this->sqs, $batchMessage, $this->connectionName, $queue);
 
