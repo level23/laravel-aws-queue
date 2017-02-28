@@ -36,6 +36,10 @@ class BatchQueue extends SqsQueue
             'MaxNumberOfMessages' => $this->maxMessages
         ]);
 
+        if(!isset($response['Messages']) or is_null($response['Messages'])) {
+            return null;
+        }
+
         if (count($response['Messages']) > 0) {
             $batchMessage = [
                 'MessageId' => null,

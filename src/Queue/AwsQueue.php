@@ -20,6 +20,10 @@ class AwsQueue extends SqsQueue
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
+        if(!isset($response['Messages']) or is_null($response['Messages'])) {
+            return null;
+        }
+
         if (count($response['Messages']) > 0) {
             $message = $this->parseJobMessage($response['Messages'][0]);
 
