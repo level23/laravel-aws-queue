@@ -49,6 +49,6 @@ class AwsServiceProviderTest extends TestCase
     {
         $connection = $this->app['queue']->connection();
 
-        $this->assertInstanceOf(AwsQueue::class,$connection);
+        $this->assertInstanceOf(AwsQueue::class, $connection);
     }
 }

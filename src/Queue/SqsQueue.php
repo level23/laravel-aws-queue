@@ -2,10 +2,10 @@
 
 namespace Level23\AwsQueue\Queue;
 
-use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Queue\SqsQueue;
+use Illuminate\Queue\SqsQueue as LaravelSqsQueue;
+use Level23\AwsQueue\Queue\Jobs\SqsJob;
 
-class AwsQueue extends SqsQueue
+class SqsQueue extends LaravelSqsQueue
 {
     /**
      * Pop the next job off of the queue.
@@ -19,10 +19,6 @@ class AwsQueue extends SqsQueue
             'QueueUrl' => $queue = $this->getQueue($queue),
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
-
-        if(!isset($response['Messages']) or is_null($response['Messages'])) {
-            return null;
-        }
 
         if (count($response['Messages']) > 0) {
             $message = $this->parseJobMessage($response['Messages'][0]);
@@ -39,15 +35,13 @@ class AwsQueue extends SqsQueue
 
     protected function parseJobMessage(array $message)
     {
-        $body = json_decode($message['Body'], true);
+        $message['Body'] = json_decode($message['Body'], true);
 
         // If there is no subject available its an sqs
-        if (isset($body['Subject'])) {
-            $message['Body'] = json_encode(
-                $this->createStringPayload(
-                    $body['Subject'],
-                    json_decode($body['Message'], true)
-                )
+        if (isset($message['Body']['Subject'])) {
+            $message['Body'] = $this->createStringPayload(
+                $message['Body']['Subject'],
+                json_decode($message['Body']['Message'], true)
             );
         }
 

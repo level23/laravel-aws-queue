@@ -6,10 +6,12 @@ use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\SqsJob;
 use Level23\AwsQueue\Queue\AwsQueue;
+use Level23\AwsQueue\Queue\BatchQueue;
+use Level23\AwsQueue\Queue\Jobs\BatchJob;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 
-class AwsQueueTest extends TestCase
+class BatchQueueTest extends TestCase
 {
     /**
      * @var PHPUnit_Framework_MockObject_MockObject|SqsClient
@@ -45,7 +47,7 @@ class AwsQueueTest extends TestCase
     {
         $this->client->expects($this->once())
             ->method('receiveMessage');
-        $queue = new AwsQueue($this->client, 'default');
+        $queue = new BatchQueue($this->client, 'default');
         $queue->setContainer($this->container);
         $queue->pop();
     }
@@ -71,19 +73,30 @@ class AwsQueueTest extends TestCase
     {
         $this->client->method('receiveMessage')->willReturn([
             'Messages' => [
-                ['Body' => json_encode([
-                    'Subject' => 'test',
-                    'Message' => json_encode(['key' => 'value'])
-                ])]
+                [
+                    'MessageId' => 1,
+                    'Body' => json_encode([
+                        'Subject' => 'test',
+                        'Message' => json_encode(['key' => 'value'])
+                    ])
+                ],
+                [
+                    'MessageId' => 2,
+                    'Body' => json_encode([
+                        'Subject' => 'test',
+                        'Message' => json_encode(['key' => 'value'])
+                    ])
+                ]
             ]
         ]);
 
-        $queue = new AwsQueue($this->client, 'default');
+        $queue = new BatchQueue($this->client, 'default');
         $queue->setContainer($this->container);
 
+        /** @var BatchJob $job */
         $job = $queue->pop();
 
-        $this->assertInstanceOf(SqsJob::class, $job);
-        $this->assertEquals(array_only(json_decode($job->getRawBody(), true), ['job','data']), $this->expectedMessage);
+        $this->assertInstanceOf(BatchJob::class, $job);
+        $this->assertCount(2, $job->getJobs());
     }
 }
