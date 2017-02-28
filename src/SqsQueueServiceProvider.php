@@ -25,7 +25,7 @@ class SqsQueueServiceProvider extends ServiceProvider
      */
     protected function registerAwsConnector(QueueManager $manager)
     {
-        $manager->addConnector('sqs', function () {
+        $manager->addConnector('sqs', function() {
             return new SqsConnector;
         });
     }
@@ -37,7 +37,7 @@ class SqsQueueServiceProvider extends ServiceProvider
      */
     protected function registerBatchConnector(QueueManager $manager)
     {
-        $manager->addConnector('sqs-batch', function () {
+        $manager->addConnector('sqs-batch', function() {
             return new BatchConnector;
         });
     }

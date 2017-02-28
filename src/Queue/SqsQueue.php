@@ -20,7 +20,7 @@ class SqsQueue extends LaravelSqsQueue
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
-        if(!isset($response['Messages']) || is_null($response['Messages'])) {
+        if (!isset($response['Messages']) || is_null($response['Messages'])) {
             return null;
         }
 

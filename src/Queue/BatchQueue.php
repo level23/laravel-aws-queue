@@ -21,7 +21,7 @@ class BatchQueue extends SqsQueue
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return null|BatchJob
      */
     public function pop($queue = null)
     {
@@ -33,7 +33,7 @@ class BatchQueue extends SqsQueue
             'MaxNumberOfMessages' => $this->maxMessages
         ]);
 
-        if(!isset($response['Messages']) or is_null($response['Messages'])) {
+        if (!isset($response['Messages']) or is_null($response['Messages'])) {
             return null;
         }
 
@@ -84,7 +84,7 @@ class BatchQueue extends SqsQueue
     }
 
     /**
-     * @param $queue
+     * @param string|null $queue
      * @return string
      */
     public function getHandler($queue)
