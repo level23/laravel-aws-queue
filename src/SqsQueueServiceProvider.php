@@ -4,10 +4,10 @@ namespace Level23\AwsQueue;
 
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
-use Level23\AwsQueue\Queue\AwsConnector;
 use Level23\AwsQueue\Queue\Connectors\BatchConnector;
+use Level23\AwsQueue\Queue\Connectors\SqsConnector;
 
-class AwsQueueServiceProvider extends ServiceProvider
+class SqsQueueServiceProvider extends ServiceProvider
 {
     /**
      * Boot the service
@@ -25,8 +25,8 @@ class AwsQueueServiceProvider extends ServiceProvider
      */
     protected function registerAwsConnector(QueueManager $manager)
     {
-        $manager->addConnector('aws', function () {
-            return new AwsConnector;
+        $manager->addConnector('sqs', function () {
+            return new SqsConnector;
         });
     }
 
@@ -37,7 +37,7 @@ class AwsQueueServiceProvider extends ServiceProvider
      */
     protected function registerBatchConnector(QueueManager $manager)
     {
-        $manager->addConnector('aws-batch', function () {
+        $manager->addConnector('sqs-batch', function () {
             return new BatchConnector;
         });
     }

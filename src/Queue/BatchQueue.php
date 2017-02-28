@@ -2,14 +2,11 @@
 
 namespace Level23\AwsQueue\Queue;
 
-use Illuminate\Queue\SqsQueue;
 use Level23\AwsQueue\Queue\Jobs\BatchJob;
 use Level23\AwsQueue\Queue\Jobs\SqsJob;
 
 class BatchQueue extends SqsQueue
 {
-    use JobParser;
-
     /**
      * @var string|null
      */

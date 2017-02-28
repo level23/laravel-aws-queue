@@ -34,21 +34,11 @@ Add the following line to your `config/app.php`
 $app->register(Level23\AwsQueue\AwsQueueServiceProvider::class);
 ```
 
-Then in your config/queue.php set the driver for sqs to use our new driver named `aws`
-```php
-'sqs' => [
-    'driver' => 'aws', //default is sqs
-    'key' => env('AWS_SQS_KEY'),
-    'secret' => env('AWS_SQS_SECRET'),
-    'prefix' => env('AWS_SQS_PREFIX'),
-    'queue' => env('AWS_SQS_QUEUE'),
-    'region' => env('AWS_SQS_REGION'),
-]
-```
+This wil override the existing sqs queue driver delivered by illuminate/queue
 
 ## Batch jobs
 
-To receive batch jobs change the driver to `aws-batch` and add the following to the config
+To receive batch jobs change the driver to `sqs-batch` and add the following to the config
 ```php
 'sqs' => [
     'driver' => 'aws-batch', //default is sqs
@@ -60,6 +50,15 @@ To receive batch jobs change the driver to `aws-batch` and add the following to 
 
 This method gives you the ability to receive messages in batch and handle them at once!
 The maximum AWS allows us is 10 messages per request
+
+```php
+
+public function handle($data) {
+    // Here you have the sqs jobs available to you
+    $jobs = $this->job->getJobs();
+}
+
+```
 
 ## Requirements
 
