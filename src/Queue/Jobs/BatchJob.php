@@ -42,7 +42,7 @@ class BatchJob extends SqsJob
      */
     public function delete()
     {
-        $entries = collect($this->jobs)->transform(function (SqsJob $job) {
+        $entries = collect($this->jobs)->transform(function(SqsJob $job) {
             return [
                 'Id' => $job->getJobId(),
                 'ReceiptHandle' => $job->getReceiptHandle()
@@ -69,7 +69,7 @@ class BatchJob extends SqsJob
      */
     public function release($delay = 0)
     {
-        $entries = collect($this->jobs)->transform(function (SqsJob $job) use ($delay) {
+        $entries = collect($this->jobs)->transform(function(SqsJob $job) use ($delay) {
             return [
                 'Id' => $job->getJobId(),
                 'ReceiptHandle' => $job->getReceiptHandle(),
