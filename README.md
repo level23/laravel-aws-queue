@@ -41,7 +41,7 @@ This wil override the existing sqs queue driver delivered by illuminate/queue
 To receive batch jobs change the driver to `sqs-batch` and add the following to the config
 ```php
 'sqs' => [
-    'driver' => 'aws-batch', //default is sqs
+    'driver' => 'sqs-batch', //default is sqs
     'max' => 10,
     'handler' => 'Classname or binding name in ioc'
     ...
