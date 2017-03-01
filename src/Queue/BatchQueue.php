@@ -2,14 +2,11 @@
 
 namespace Level23\AwsQueue\Queue;
 
-use Illuminate\Queue\SqsQueue;
 use Level23\AwsQueue\Queue\Jobs\BatchJob;
 use Level23\AwsQueue\Queue\Jobs\SqsJob;
 
 class BatchQueue extends SqsQueue
 {
-    use JobParser;
-
     /**
      * @var string|null
      */
@@ -18,13 +15,13 @@ class BatchQueue extends SqsQueue
     /**
      * @var int
      */
-    protected $maxMessages = 1;
+    protected $maxMessages = 10;
 
     /**
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return null|BatchJob
      */
     public function pop($queue = null)
     {
@@ -36,41 +33,41 @@ class BatchQueue extends SqsQueue
             'MaxNumberOfMessages' => $this->maxMessages
         ]);
 
-        if(!isset($response['Messages']) or is_null($response['Messages'])) {
+        if (!$this->hasMessages($response)) {
             return null;
         }
 
-        if (count($response['Messages']) > 0) {
-            $batchMessage = [
-                'MessageId' => null,
-                'Body' => $this->createStringPayload($this->getHandler($queue), [])
-            ];
+        $batchMessage = [
+            'MessageId' => null,
+            'Body' => $this->createStringPayload($this->getHandler($queue), [])
+        ];
 
-            $batchJob = new BatchJob($this->container, $this->sqs, $batchMessage, $this->connectionName, $queueUrl);
+        $batchJob = new BatchJob($this->container, $this->sqs, $batchMessage, $this->connectionName, $queueUrl);
 
-            foreach ($response['Messages'] as $message) {
-                $message = $this->parseJobMessage($message);
+        foreach ($response['Messages'] as $message) {
+            $message = $this->parseJobMessage($message);
 
-                $batchJob->pushJob(new SqsJob(
-                    $this->container,
-                    $this->sqs,
-                    $message,
-                    $this->connectionName,
-                    $queueUrl
-                ));
-            }
-
-            return $batchJob;
+            $batchJob->pushJob(new SqsJob(
+                $this->container,
+                $this->sqs,
+                $message,
+                $this->connectionName,
+                $queueUrl
+            ));
         }
+
+        return $batchJob;
     }
 
     /**
      * @param int $max
      * @return $this
      */
-    public function setMaxMessages(int $max = 1)
+    public function setMaxMessages(int $max = null)
     {
-        $this->maxMessages = $max;
+        if(is_int($max)) {
+            $this->maxMessages = $max;
+        }
 
         return $this;
     }
@@ -87,7 +84,7 @@ class BatchQueue extends SqsQueue
     }
 
     /**
-     * @param $queue
+     * @param string|null $queue
      * @return string
      */
     public function getHandler($queue)

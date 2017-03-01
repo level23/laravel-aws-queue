@@ -17,16 +17,23 @@ class SqsConnector extends LaravelSqsConnector
      */
     public function connect(array $config)
     {
-        $config = $this->getDefaultConfiguration($config);
-
-        if ($config['key'] && $config['secret']) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret']);
-        }
+        $config = $this->getConfig($config);
 
         return new SqsQueue(
             new SqsClient($config),
             $config['queue'],
             Arr::get($config, 'prefix', '')
         );
+    }
+
+    protected function getConfig(array $config)
+    {
+        $config = $this->getDefaultConfiguration($config);
+
+        if ($config['key'] && $config['secret']) {
+            $config['credentials'] = Arr::only($config, ['key', 'secret']);
+        }
+
+        return $config;
     }
 }

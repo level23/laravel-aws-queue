@@ -4,12 +4,12 @@ namespace Level23\AwsQueue\Tests;
 
 use Aws\Sqs\SqsClient;
 use Illuminate\Container\Container;
-use Illuminate\Queue\Jobs\SqsJob;
-use Level23\AwsQueue\Queue\AwsQueue;
+use Level23\AwsQueue\Queue\Jobs\SqsJob;
+use Level23\AwsQueue\Queue\SqsQueue;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 
-class AwsQueueTest extends TestCase
+class SqsQueueTest extends TestCase
 {
     /**
      * @var PHPUnit_Framework_MockObject_MockObject|SqsClient
@@ -45,7 +45,7 @@ class AwsQueueTest extends TestCase
     {
         $this->client->expects($this->once())
             ->method('receiveMessage');
-        $queue = new AwsQueue($this->client, 'default');
+        $queue = new SqsQueue($this->client, 'default');
         $queue->setContainer($this->container);
         $queue->pop();
     }
@@ -58,13 +58,13 @@ class AwsQueueTest extends TestCase
             ]
         ]);
 
-        $queue = new AwsQueue($this->client, 'default');
+        $queue = new SqsQueue($this->client, 'default');
         $queue->setContainer($this->container);
 
         $job = $queue->pop();
 
         $this->assertInstanceOf(SqsJob::class, $job);
-        $this->assertEquals(json_decode($job->getRawBody(), true), $this->expectedMessage);
+        $this->assertEquals($job->getRawBody(), $this->expectedMessage);
     }
 
     public function testCanReceiveSNSMessage()
@@ -78,12 +78,12 @@ class AwsQueueTest extends TestCase
             ]
         ]);
 
-        $queue = new AwsQueue($this->client, 'default');
+        $queue = new SqsQueue($this->client, 'default');
         $queue->setContainer($this->container);
 
         $job = $queue->pop();
 
         $this->assertInstanceOf(SqsJob::class, $job);
-        $this->assertEquals(array_only(json_decode($job->getRawBody(), true), ['job','data']), $this->expectedMessage);
+        $this->assertEquals(array_only($job->getRawBody(), ['job','data']), $this->expectedMessage);
     }
 }
