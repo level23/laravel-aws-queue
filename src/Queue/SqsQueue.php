@@ -20,21 +20,19 @@ class SqsQueue extends LaravelSqsQueue
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
-        if (!isset($response['Messages']) || is_null($response['Messages'])) {
+        if (!$this->hasMessages($response)) {
             return null;
         }
 
-        if (count($response['Messages']) > 0) {
-            $message = $this->parseJobMessage($response['Messages'][0]);
+        $message = $this->parseJobMessage($response['Messages'][0]);
 
-            return new SqsJob(
-                $this->container,
-                $this->sqs,
-                $message,
-                $this->connectionName,
-                $queue
-            );
-        }
+        return new SqsJob(
+            $this->container,
+            $this->sqs,
+            $message,
+            $this->connectionName,
+            $queue
+        );
     }
 
     /**
@@ -56,5 +54,20 @@ class SqsQueue extends LaravelSqsQueue
         }
 
         return $message;
+    }
+
+    /**
+     * Check if response has messages
+     *
+     * @param $response
+     * @return bool
+     */
+    protected function hasMessages($response)
+    {
+        if (isset($response['Messages']) && is_array($response['Messages']) && count($response['Messages']) > 0) {
+            return true;
+        }
+
+        return false;
     }
 }

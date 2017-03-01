@@ -33,32 +33,30 @@ class BatchQueue extends SqsQueue
             'MaxNumberOfMessages' => $this->maxMessages
         ]);
 
-        if (!isset($response['Messages']) or is_null($response['Messages'])) {
+        if (!$this->hasMessages($response)) {
             return null;
         }
 
-        if (count($response['Messages']) > 0) {
-            $batchMessage = [
-                'MessageId' => null,
-                'Body' => $this->createStringPayload($this->getHandler($queue), [])
-            ];
+        $batchMessage = [
+            'MessageId' => null,
+            'Body' => $this->createStringPayload($this->getHandler($queue), [])
+        ];
 
-            $batchJob = new BatchJob($this->container, $this->sqs, $batchMessage, $this->connectionName, $queueUrl);
+        $batchJob = new BatchJob($this->container, $this->sqs, $batchMessage, $this->connectionName, $queueUrl);
 
-            foreach ($response['Messages'] as $message) {
-                $message = $this->parseJobMessage($message);
+        foreach ($response['Messages'] as $message) {
+            $message = $this->parseJobMessage($message);
 
-                $batchJob->pushJob(new SqsJob(
-                    $this->container,
-                    $this->sqs,
-                    $message,
-                    $this->connectionName,
-                    $queueUrl
-                ));
-            }
-
-            return $batchJob;
+            $batchJob->pushJob(new SqsJob(
+                $this->container,
+                $this->sqs,
+                $message,
+                $this->connectionName,
+                $queueUrl
+            ));
         }
+
+        return $batchJob;
     }
 
     /**
