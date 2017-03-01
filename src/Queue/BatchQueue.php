@@ -15,7 +15,7 @@ class BatchQueue extends SqsQueue
     /**
      * @var int
      */
-    protected $maxMessages = 1;
+    protected $maxMessages = 10;
 
     /**
      * Pop the next job off of the queue.
@@ -63,9 +63,11 @@ class BatchQueue extends SqsQueue
      * @param int $max
      * @return $this
      */
-    public function setMaxMessages(int $max = 1)
+    public function setMaxMessages(int $max = null)
     {
-        $this->maxMessages = $max;
+        if(is_int($max)) {
+            $this->maxMessages = $max;
+        }
 
         return $this;
     }

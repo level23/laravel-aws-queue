@@ -18,7 +18,7 @@ class BatchConnector extends SqsConnector
     {
         $config      = $this->getConfig($config);
         $handler     = Arr::pull($config, 'handler');
-        $maxMessages = Arr::pull($config, 'max', 1);
+        $maxMessages = Arr::pull($config, 'max', 10);
         $queue       = new BatchQueue(new SqsClient($config), $config['queue'], Arr::get($config, 'prefix', ''));
 
         return $queue->setHandlerClass($handler)->setMaxMessages($maxMessages);
