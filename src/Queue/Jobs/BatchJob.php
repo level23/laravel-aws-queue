@@ -42,20 +42,27 @@ class BatchJob extends SqsJob
      */
     public function delete()
     {
-        $entries = collect($this->jobs)->transform(function(SqsJob $job) {
-            return [
-                'Id' => $job->getJobId(),
-                'ReceiptHandle' => $job->getReceiptHandle()
-            ];
-        });
+        $entries = collect($this->jobs)
+            ->filter(function(SqsJob $job) {
+                return !$job->isDeletedOrReleased();
+            })
+            ->transform(function(SqsJob $job) {
+                return [
+                    'Id' => $job->getJobId(),
+                    'ReceiptHandle' => $job->getReceiptHandle()
+                ];
+            });
 
-        $response = $this->sqs->deleteMessageBatch([
-            'QueueUrl' => $this->queue,
-            'Entries' => $entries->values()->toArray(),
-        ]);
+        if($entries->isNotEmpty()) {
 
-        foreach ($response['Successful'] as $message) {
-            $this->jobs[$message['Id']]->setDeleted();
+            $response = $this->sqs->deleteMessageBatch([
+                'QueueUrl' => $this->queue,
+                'Entries' => $entries->values()->toArray(),
+            ]);
+
+            foreach ($response['Successful'] as $message) {
+                $this->jobs[$message['Id']]->setDeleted();
+            }
         }
 
         $this->deleted = true;
