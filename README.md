@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/level23/laravel-aws-queue.svg?branch=master)](https://travis-ci
-.org/level23/laravel-aws-queue)
+[![Build Status](https://travis-ci.org/level23/laravel-aws-queue.svg?branch=master)](https://travis-ci.org/level23/laravel-aws-queue)
 
 # Laravel AWS Queue
 This package adds a connection driver for sqs to allow for messages send by AWS SNS(Simple Notification Service) to 
