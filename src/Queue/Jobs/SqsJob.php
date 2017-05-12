@@ -7,6 +7,11 @@ use Illuminate\Queue\Jobs\SqsJob as LaravelSqsJob;
 class SqsJob extends LaravelSqsJob
 {
     /**
+     * @var mixed
+     */
+    protected $error;
+
+    /**
      * Get the decoded body of the job.
      *
      * @return array
@@ -50,5 +55,21 @@ class SqsJob extends LaravelSqsJob
     public function setReleased()
     {
         $this->released = true;
+    }
+
+    /**
+     * @param mixed $error
+     */
+    public function setError($error)
+    {
+        $this->error = $error;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getError()
+    {
+        return $this->error;
     }
 }

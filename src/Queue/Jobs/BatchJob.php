@@ -2,6 +2,8 @@
 
 namespace Level23\AwsQueue\Queue\Jobs;
 
+use Illuminate\Support\Collection;
+
 class BatchJob extends SqsJob
 {
     /**
@@ -38,58 +40,83 @@ class BatchJob extends SqsJob
     /**
      * Delete the job from the queue.
      *
-     * @return void
+     * @return Collection
      */
     public function delete()
     {
-        $entries = collect($this->jobs)
-            ->filter(function(SqsJob $job) {
-                return !$job->isDeletedOrReleased();
-            })
-            ->transform(function(SqsJob $job) {
-                return [
-                    'Id' => $job->getJobId(),
-                    'ReceiptHandle' => $job->getReceiptHandle()
-                ];
-            });
+        $jobs = collect($this->jobs)->filter(function (SqsJob $job) {
+            return !$job->isDeletedOrReleased();
+        });
 
-        if($entries->isNotEmpty()) {
+        $response = $this->deleteJobs($jobs);
+
+        $this->deleted = true;
+
+        return $response;
+    }
+
+    /**
+     * @param Collection $jobs
+     * @return Collection
+     */
+    public function deleteJobs(Collection $jobs)
+    {
+        $jobs = $jobs->keyBy(function(SqsJob $job) {
+            return $job->getJobId();
+        });
+
+        $entries = $jobs->map(function (SqsJob $job) {
+            return [
+                'Id'            => $job->getJobId(),
+                'ReceiptHandle' => $job->getReceiptHandle(),
+            ];
+        });
+
+        $failedJobs = collect();
+
+        if ($entries->isNotEmpty()) {
 
             $response = $this->sqs->deleteMessageBatch([
                 'QueueUrl' => $this->queue,
-                'Entries' => $entries->values()->toArray(),
+                'Entries'  => $entries->values()->toArray(),
             ]);
 
-            foreach ($response['Successful'] as $message) {
+            foreach (collect($response->get('Successful')) as $message) {
                 $this->jobs[$message['Id']]->setDeleted();
+            }
+
+            foreach (collect($response->get('Failed')) as $message) {
+                $job = $jobs->get($message['Id']);
+                $job->error(array_except($message,'Id'));
+                $failedJobs->put($message['Id'],$job);
             }
         }
 
-        $this->deleted = true;
+        return $failedJobs;
     }
 
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param  int $delay
      * @return void
      */
     public function release($delay = 0)
     {
-        $entries = collect($this->jobs)->transform(function(SqsJob $job) use ($delay) {
+        $entries = collect($this->jobs)->transform(function (SqsJob $job) use ($delay) {
             return [
-                'Id' => $job->getJobId(),
-                'ReceiptHandle' => $job->getReceiptHandle(),
+                'Id'                => $job->getJobId(),
+                'ReceiptHandle'     => $job->getReceiptHandle(),
                 'VisibilityTimeout' => $delay,
             ];
         });
 
         $response = $this->sqs->changeMessageVisibilityBatch([
             'QueueUrl' => $this->queue,
-            'Entries' => $entries->values()->toArray(),
+            'Entries'  => $entries->values()->toArray(),
         ]);
 
-        foreach ($response['Successful'] as $message) {
+        foreach (collect($response->get('Successful')) as $message) {
             $this->jobs[$message['Id']]->setDeleted();
         }
     }
