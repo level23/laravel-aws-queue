@@ -87,7 +87,7 @@ class BatchJob extends SqsJob
 
             foreach (collect($response->get('Failed')) as $message) {
                 $job = $jobs->get($message['Id']);
-                $job->error(array_except($message,'Id'));
+                $job->setError(array_except($message,'Id'));
                 $failedJobs->put($message['Id'],$job);
             }
         }
