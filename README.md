@@ -1,4 +1,8 @@
-[![Build Status](https://travis-ci.org/level23/laravel-aws-queue.svg?branch=master)](https://travis-ci.org/level23/laravel-aws-queue)
+## ⚠️ Project Status: Abandoned
+
+This project is no longer maintained.
+Issues and pull requests are not being monitored.
+
 
 # Laravel AWS Queue
 This package adds a connection driver for sqs to allow for messages send by AWS SNS(Simple Notification Service) to 
